@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>Player</title>
+    </head>
+    <body>
+        <div id="player-wrapper"></div>
+        <script defer src="https://cdn.jsdelivr.net/clappr/latest/clappr.min.js"></script>
+        <script defer src="clappr.ads.js"></script>
+        <script>
+            window.addEventListener('load', function() {
+                var playerElement = document.getElementById("player-wrapper");
+
+                var player = new Clappr.Player({
+                    source: 'http://clappr.io/highline.mp4',
+                    baseUrl: '/latest',
+                    poster: 'http://clappr.io/poster.png',
+                    mute: true,
+                    height: 360,
+                    width: 640,
+                    plugins: [ClapprAds],
+                    ads: {
+                        preRoll: {
+                            src: 'video1.mp4',
+                            skip: true,
+                            timeout: 5
+                        },
+                        postRoll: {
+                            src: 'video1.mp4'
+                        },
+                        text: {
+                            wait: 'Aguardar % segundos...',
+                            skip: 'Pular para vídeo'
+                        }
+                    }
+                });
+
+                player.attachTo(playerElement);
+            });
+        </script>
+    </body>
+</html>
