@@ -98,6 +98,7 @@
     var ClapprAds = Clappr.UICorePlugin.extend({
         _isAdPlaying: false,
         _hasPreRollPlayed: false,
+        _hasPostRollPlayed: false,
         _preRoll: false,
         _postRoll: false,
         _videoText: {},
@@ -199,7 +200,7 @@
 
         playPostRoll: function(container) {
             // post-roll will not run if played before or unset
-            if (!this._postRoll)
+            if (!this._postRoll || this._hasPostRollPlayed)
                 return;
 
             // bail if current time is smaller than duration
@@ -209,6 +210,9 @@
             if (current != duration)
                 return;
             
+            // prevent multiple calls whilst running
+            this._hasPostRollPlayed = true;
+
             // pause playback
             container.playback.pause();
             
