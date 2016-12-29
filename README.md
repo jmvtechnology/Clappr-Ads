@@ -26,7 +26,7 @@ var player = new Clappr.Player({
 ### Options
 
 |Parameter|type|Optional|Default Value|Description|
-|-|-|-|-|-|
+|---|---|---|---|---|
 |ads.preRoll|object|true|-|-|
 |ads.preRoll.src|object/array|false|-|If array, it randomly selects a value|
 |ads.preRoll.skip|boolean|true|true|Shows skip button with countdown|
