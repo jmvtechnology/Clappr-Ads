@@ -82,7 +82,7 @@
         this.wrapper.parentNode.removeChild(this.wrapper);
 
         // fire on end
-        if ('onEnd' in this) {
+        if (typeof(this.onEnd) === "function") {
             this.onEnd();
         }
     };
@@ -98,7 +98,6 @@
     var ClapprAds = Clappr.UICorePlugin.extend({
         _isAdPlaying: false,
         _hasPreRollPlayed: false,
-        _hasPostRollPlayed: false,
         _preRoll: false,
         _postRoll: false,
         _videoText: {},
@@ -137,10 +136,10 @@
             this.listenTo(this.core, Clappr.Events.CORE_READY, (function() {
                 // get container
                 var container = this.core.getCurrentContainer();
-                // listen to play
+                // listeners
                 container.listenTo(container.playback, Clappr.Events.PLAYBACK_PLAY, this._onPlaybackPlay.bind(this, container));
-                // listen to video end
                 container.listenTo(container.playback, Clappr.Events.PLAYBACK_TIMEUPDATE, this.playPostRoll.bind(this, container));
+                container.listenTo(container.playback, Clappr.Events.PLAYBACK_ENDED, this._onPlaybackEnd.bind(this));
             }).bind(this));
         },
 
@@ -152,6 +151,11 @@
             } else {
                 this.playPreRoll(container);
             }
+        },
+
+        _onPlaybackEnd: function() {
+            this._isAdPlaying = false;
+            this._hasPreRollPlayed = false;
         },
 
         playPreRoll: function(container) {
@@ -195,7 +199,7 @@
 
         playPostRoll: function(container) {
             // post-roll will not run if played before or unset
-            if (!this._postRoll || this._hasPostRollPlayed)
+            if (!this._postRoll)
                 return;
 
             // bail if current time is smaller than duration
@@ -223,6 +227,10 @@
             // render video
             container.$el.append(video.wrapper);
             video.play();
+            video.onEnd = (function() {
+                this._isAdPlaying = false;
+            }).bind(this);
+            this._isAdPlaying = true;
         },
 
         _onPreRollEnd: function(video, playback) {
