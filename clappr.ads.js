@@ -118,7 +118,7 @@
                     this._postRoll = this._options.ads.postRoll;
                 }
                 if ('text' in this._options.ads) {
-                    var text = this._options.ads;
+                    var text = this._options.ads.text;
                     if ('wait' in text) {
                         this._videoText.wait = text.wait;
                     }
