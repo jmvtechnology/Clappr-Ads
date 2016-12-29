@@ -28,11 +28,11 @@ var player = new Clappr.Player({
 |Parameter|type|Optional|Default Value|Description|
 |---|---|---|---|---|
 |ads.preRoll|object|true|-|-|
-|ads.preRoll.src|object/array|false|-|If array, it randomly selects a value|
+|ads.preRoll.src|string/array|false|-|If array, it randomly selects a value|
 |ads.preRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.preRoll.timeout|integer|true|5|Countdown time|
 |ads.postRoll|object|true|-|-|
-|ads.postRoll.src|object/array|false|-|If array, it randomly selects a value|
+|ads.postRoll.src|string/array|false|-|If array, it randomly selects a value|
 |ads.text|object|true|-|-|
 |ads.text.wait|string|true|Wait % seconds|Skip button wait text|
 |ads.text.skip|string|true|Skip >|Skip button action text|
