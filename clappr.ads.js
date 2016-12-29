@@ -98,6 +98,7 @@
     var ClapprAds = Clappr.UICorePlugin.extend({
         _isAdPlaying: false,
         _hasPreRollPlayed: false,
+        _hasPostRollPlayed: false,
         _preRoll: false,
         _postRoll: false,
         _videoText: {},
@@ -139,7 +140,7 @@
                 // listen to play
                 container.listenTo(container.playback, Clappr.Events.PLAYBACK_PLAY, this._onPlaybackPlay.bind(this, container));
                 // listen to video end
-                container.listenTo(container.playback, Clappr.Events.PLAYBACK_ENDED, this.playPostRoll.bind(this, container));
+                container.listenTo(container.playback, Clappr.Events.PLAYBACK_TIMEUPDATE, this.playPostRoll.bind(this, container));
             }).bind(this));
         },
 
@@ -160,7 +161,6 @@
             
             // if src is an array
             // select randomly one of the videos
-            // and play it
             var src;
             if (typeof(this._preRoll.src) === "object") {
                 src = this._preRoll.src[this._rand(0, this._preRoll.src.length - 1)];
@@ -194,7 +194,35 @@
         },
 
         playPostRoll: function(container) {
+            // post-roll will not run if played before or unset
+            if (!this._postRoll || this._hasPostRollPlayed)
+                return;
 
+            // bail if current time is smaller than duration
+            var current = container.currentTime;
+            var duration = container.getDuration();
+
+            if (current != duration)
+                return;
+            
+            // pause playback
+            container.playback.pause();
+            
+            // if src is an array
+            // select randomly one of the videos
+            var src;
+            if (typeof(this._preRoll.src) === "object") {
+                src = this._preRoll.src[this._rand(0, this._preRoll.src.length - 1)];
+            } else {
+                src = this._preRoll.src;
+            }
+
+            // initialize video
+            video = new Video(src);
+            
+            // render video
+            container.$el.append(video.wrapper);
+            video.play();
         },
 
         _onPreRollEnd: function(video, playback) {
