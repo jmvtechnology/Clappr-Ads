@@ -38,7 +38,7 @@ var player = new Clappr.Player({
 |ads.preRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.preRoll.timeout|integer|true|5|Countdown time|
 |ads.midRoll|object|true|-|-|
-|ads.midRoll|integer/array|true|-|if unset, ad will play when video reaches 50%. If array, add will play in the time (seconds) specified. If integer, ad will play once the the time (seconds) specified|
+|ads.midRoll.at|integer/array|true|-|if unset, ad will play when video reaches 50%. If array, add will play in the time (seconds) specified. If integer, ad will play once the the time (seconds) specified|
 |ads.midRoll.src|string/array|false|-|If array, it randomly selects a value, unless it matches property 'at' in size, then it will play in order|
 |ads.midRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.midRoll.timeout|integer|true|5|Countdown time|
