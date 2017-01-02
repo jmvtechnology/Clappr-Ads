@@ -12,6 +12,12 @@ var player = new Clappr.Player({
             skip: true,
             timeout: 5
         },
+        midRoll: {
+            at: [10, 20, 35],
+            src: ['video_1.mp4', 'video_2.mp4', 'video_3.mp4'],
+            skip: true,
+            timeout: 5
+        },
         postRoll: {
             src: 'video1.mp4'
         },
@@ -25,12 +31,17 @@ var player = new Clappr.Player({
 
 ### Options
 
-|Parameter|type|Optional|Default Value|Description|
+|Parameter|Type|Optional|Default Value|Description|
 |---|---|---|---|---|
 |ads.preRoll|object|true|-|-|
 |ads.preRoll.src|string/array|false|-|If array, it randomly selects a value|
 |ads.preRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.preRoll.timeout|integer|true|5|Countdown time|
+|ads.midRoll|object|true|-|-|
+|ads.midRoll|integer/array|true|-|if unset, ad will play when video reaches 50%. If array, add will play in the time (seconds) specified. If integer, ad will play once the the time (seconds) specified|
+|ads.midRoll.src|string/array|false|-|If array, it randomly selects a value, unless it matches property 'at' in size, then it will play in order|
+|ads.midRoll.skip|boolean|true|true|Shows skip button with countdown|
+|ads.midRoll.timeout|integer|true|5|Countdown time|
 |ads.postRoll|object|true|-|-|
 |ads.postRoll.src|string/array|false|-|If array, it randomly selects a value|
 |ads.text|object|true|-|-|
