@@ -100,6 +100,7 @@
         _hasPreRollPlayed: false,
         _hasPostRollPlayed: false,
         _preRoll: false,
+        _midRoll: false,
         _postRoll: false,
         _videoText: {},
         _rand: function (min, max) {
@@ -112,12 +113,34 @@
             // get adplayer options
             if ('ads' in this._options) {
                 if ('preRoll' in this._options.ads) {
-                    this._preRoll = this._options.ads.preRoll;
+                    if ('src' in this._options.ads.preRoll) {
+                        this._preRoll = this._options.ads.preRoll;
+                    } else {
+                        throw "No source";
+                    }
+                }
+
+                if ('midRoll' in this._options.ads) {
+                    if ('src' in this._options.ads.midRoll) {
+                        this._midRoll = this._options.ads.midRoll;
+
+                        // transform string src into an array
+                        if (typeof(this._midRoll.src) === "string") {
+                            this._midRoll.src = [this._midRoll.src];
+                        }
+                    } else {
+                        throw "No source";
+                    }
                 }
 
                 if ('postRoll' in this._options.ads) {
-                    this._postRoll = this._options.ads.postRoll;
+                    if ('src' in this._options.ads.postRoll) {
+                        this._postRoll = this._options.ads.postRoll;
+                    } else {
+                        throw "No source";
+                    }
                 }
+
                 if ('text' in this._options.ads) {
                     var text = this._options.ads.text;
                     if ('wait' in text) {
@@ -139,7 +162,7 @@
                 var container = this.core.getCurrentContainer();
                 // listeners
                 container.listenTo(container.playback, Clappr.Events.PLAYBACK_PLAY, this._onPlaybackPlay.bind(this, container));
-                container.listenTo(container.playback, Clappr.Events.PLAYBACK_TIMEUPDATE, this.playPostRoll.bind(this, container));
+                container.listenTo(container.playback, Clappr.Events.PLAYBACK_TIMEUPDATE, this._onPlaybackTimeUpdate.bind(this, container));
                 container.listenTo(container.playback, Clappr.Events.PLAYBACK_ENDED, this._onPlaybackEnd.bind(this));
             }).bind(this));
         },
@@ -150,7 +173,51 @@
             if (this._isAdPlaying) {
                 container.playback.pause();
             } else {
+                // pre-roll will not run if played before or unset
+                if (!this._preRoll || this._hasPreRollPlayed)
+                    return;
+
                 this.playPreRoll(container);
+            }
+        },
+
+        _onPlaybackTimeUpdate: function(container) {
+            // fetch current time and duration
+            var current = container.currentTime;
+            var duration = container.getDuration();
+
+            if (this._midRoll) {
+                var atTimes;
+                if ('at' in this._midRoll) {
+                    atTimes = this._midRoll.at;
+                } else {
+                    atTimes = [Math.floor(duration / 2)];
+                }
+
+                var inAtTimes = false, at, index;
+                for (var i = 0; i < atTimes.length; i++) {
+                    at = atTimes[i];
+                    if (Math.floor(current) == at) {
+                        index = i;
+                        inAtTimes = true;
+                    }
+                }
+
+                if (inAtTimes) {
+                    if (this._midRoll.at.length === this._midRoll.src.length) {
+                        this.playMidRoll(container, index);
+                    } else {
+                        this.playMidRoll(container);
+                    }
+                }
+            }
+
+            // post-roll will not run if played before
+            if (this._postRoll && !this._hasPostRollPlayed) {
+                // if the video is in it's end, play post-roll
+                if (current == duration) {
+                    this.playPostRoll(container);
+                }
             }
         },
 
@@ -160,10 +227,10 @@
         },
 
         playPreRoll: function(container) {
-            // pre-roll will not run if played before or unset
-            if (!this._preRoll || this._hasPreRollPlayed)
+            // bail if ad is playing
+            if (this._isAdPlaying)
                 return;
-            
+
             // if src is an array
             // select randomly one of the videos
             var src;
@@ -192,24 +259,55 @@
             // render video
             container.$el.append(video.wrapper);
             video.play();
-            this._isAdPlaying = true;
 
             // make sure pre-roll wont play again
             this._hasPreRollPlayed = true;
         },
 
-        playPostRoll: function(container) {
-            // post-roll will not run if played before or unset
-            if (!this._postRoll || this._hasPostRollPlayed)
+        playMidRoll: function(container, index) {
+            // bail if ad is playing
+            if (this._isAdPlaying)
                 return;
 
-            // bail if current time is smaller than duration
-            var current = container.currentTime;
-            var duration = container.getDuration();
+            this._isAdPlaying = true;
 
-            if (current != duration)
+            // pause playback
+            container.playback.pause();
+
+            // go to next second
+            // to prevent a midroll loop
+            container.playback.seek(parseInt(Math.floor(container.currentTime + 1)));
+
+            var src;
+
+            // if index was not set
+            // select source randomly
+            // otherwise get source index
+            if (index === undefined) {
+                src = this._midRoll.src[this._rand(0, this._midRoll.src.length - 1)];
+            } else {
+                src = this._midRoll.src[index];
+            }
+
+            // initialize video
+            video = new Video(src, this._midRoll.skip, this._midRoll.timeout);
+            
+            // render video
+            container.$el.append(video.wrapper);
+            video.play();
+            video.onEnd = (function() {
+                this._isAdPlaying = false;
+            }).bind(this);
+            
+        },
+
+        playPostRoll: function(container) {
+            // bail if ad is playing
+            if (this._isAdPlaying)
                 return;
             
+            this._isAdPlaying = true;
+
             // prevent multiple calls whilst running
             this._hasPostRollPlayed = true;
 
@@ -234,7 +332,6 @@
             video.onEnd = (function() {
                 this._isAdPlaying = false;
             }).bind(this);
-            this._isAdPlaying = true;
         },
 
         _onPreRollEnd: function(video, playback) {
