@@ -29,6 +29,62 @@ var player = new Clappr.Player({
 });
 ```
 
+### Mid-Roll
+
+#### Simplest Setup
+
+Ad will play once halfway through the video
+
+```JS
+midRoll: {
+    src: 'video.mp4',
+},
+```
+
+#### Time Setup
+
+Specifying when ad will play
+
+```JS
+midRoll: {
+    at: 30, // 30 seconds
+    src: 'video.mp4',
+},
+```
+
+#### Random Videos Setup
+
+Ad will be randomly selected
+
+```JS
+midRoll: {
+    src: ['video1.mp4', 'video2.mp4', 'video3.mp4']
+},
+```
+
+#### Multiple Videos Setup
+
+Ads will play in different parts of the video
+
+```JS
+midRoll: {
+    at: [30, 60, 120],
+    src: ['video1.mp4', 'video2.mp4', 'video3.mp4']
+},
+```
+
+#### Skipable Setup
+
+Ad will be skipable
+
+```JS
+midRoll: {
+    src: 'video.mp4',
+    skip: true,
+    timeout: 5
+},
+```
+
 ### Options
 
 |Parameter|Type|Optional|Default Value|Description|
