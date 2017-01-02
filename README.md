@@ -1,5 +1,5 @@
 # Clappr-Ads
-Pre-roll &amp; post-roll ads for the Clappr player
+Pre-roll, mid-roll and post-roll ads for the Clappr player
 
 ### Set Up
 ```JS
