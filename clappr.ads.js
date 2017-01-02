@@ -128,6 +128,13 @@
                         if (typeof(this._midRoll.src) === "string") {
                             this._midRoll.src = [this._midRoll.src];
                         }
+
+                        if ('at' in this._midRoll) {
+                            // if not an array, transform to array
+                            if (typeof(this._midRoll.at) != "object") {
+                                this._midRoll.at = [this._midRoll.at];
+                            }
+                        }
                     } else {
                         throw "No source";
                     }
