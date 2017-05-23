@@ -222,7 +222,7 @@
             // post-roll will not run if played before
             if (this._postRoll && !this._hasPostRollPlayed && current) {
                 // if the video is in it's end, play post-roll
-                if (current == duration) {
+                if (Math.round(current * 1000) == Math.round(duration * 1000)) {
                     this.playPostRoll(container);
                 }
             }
