@@ -21,40 +21,27 @@
 
     Video.prototype._initWrapper = function() {
         var el = document.createElement('div');
-        el.style.display = 'block';
-        el.style.position = 'absolute';
-        el.style.width = '100%';
-        el.style.height = '100%';
-        el.style.top = '0px';
-        el.style.left = '0px';
-        el.style.zIndex = 10000;
+        el.className = 'clappr-ads-wrapper';
         return el;
     };
 
     Video.prototype._initVideo = function(src) {
         var el = document.createElement('video');
-        el.style.display = 'block';
-        el.style.position = 'absolute';
-        el.style.width = '100%';
-        el.style.height = '100%';
         el.controls = false;
         el.src = src;
         el.addEventListener('ended', this._end.bind(this));
+        el.addEventListener('click', function (evt) {
+            if (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
+        }.bind(this));
         return el;
     };
 
     Video.prototype._initSkipButton = function (timeout) {
         var el = document.createElement('button');
-        el.style.display = 'none';
-        el.style.position = 'absolute';
-        el.style.bottom = '45px';
-        el.style.right = '0px';
-        el.style.padding = '15px';
-        el.style.backgroundColor = '#000';
-        el.style.border = 'solid thin #000';
-        el.style.fontSize = '12px';
-        el.style.color = '#FFF';
-        el.style.right = '-1px';
+        el.className = 'clappr-ads-skip-button';
         el.disabled = true;
         el.addEventListener('click', this._end.bind(this));
         this._skipButtonCountdown(el, timeout);
@@ -63,17 +50,25 @@
 
     Video.prototype._initMuteButton = function() {
         var el = document.createElement('div');
-        el.style.position = 'absolute';
-        el.style.bottom = '145px';
-        el.style.right = '100px';
-        el.style.padding = '15px';
-        el.style.backgroundColor = '#000';
-        el.style.border = 'solid thin #000';
-        el.style.fontSize = '12px';
-        el.style.color = '#FFF';
-        el.innerText = 'Volume';
-        el.addEventListener('click', function () {
+        el.className = 'clappr-ads-mute-button clappr-ads-mute-button-off';
+        el.addEventListener('click', function (evt) {
+            if (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
+
             this.video.muted = !this.video.muted;
+
+            // switch button-on / button-off css class
+            var className = evt.target.className
+                .replace('clappr-ads-mute-button-on', '')
+                .replace('clappr-ads-mute-button-off', '');
+
+            className = this.video.muted ?
+                (className += ' clappr-ads-mute-button-on') :
+                (className += ' clappr-ads-mute-button-off');
+
+            evt.target.className = className;
         }.bind(this));
         return el;
     };
@@ -94,8 +89,10 @@
 
     Video.prototype._end = function(evt) {
         // if click, prevent default
-        if (evt)
+        if (evt) {
             evt.preventDefault();
+            evt.stopPropagation();
+        }
 
         // remove video from the DOM
         this.wrapper.parentNode.removeChild(this.wrapper);
@@ -116,6 +113,10 @@
 
     Video.prototype.attachMuteButton = function () {
         this.wrapper.appendChild(this.muteButton);
+    };
+
+    Video.prototype.attachOnClick = function (onClick) {
+        this.video.addEventListener('click', onClick);
     };
 
     var ClapprAds = Clappr.UICorePlugin.extend({
@@ -264,8 +265,10 @@
             // if src is an array
             // select randomly one of the videos
             var src;
-            if (typeof(this._preRoll.src) === "object") {
-                src = this._preRoll.src[this._rand(0, this._preRoll.src.length - 1)];
+            var index = 0;
+            if (typeof (this._preRoll.src) === "object") {
+                index = this._rand(0, this._preRoll.src.length - 1);
+                src = this._preRoll.src[index];
             } else {
                 src = this._preRoll.src;
             }
@@ -291,13 +294,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._preRoll) {
+                video.attachOnClick(function (evt) {
+                    this._preRoll.onClick(this._preRoll, { position: 'preroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._preRoll) {
-                this._preRoll.onPlay(this._preRoll, { position: 'preroll' });
+                this._preRoll.onPlay(this._preRoll, { position: 'preroll', index: index });
             }
 
             // make sure pre-roll wont play again
@@ -319,12 +329,14 @@
             container.playback.seek(parseInt(Math.floor(container.currentTime + 1)));
 
             var src;
+            var index = 0;
 
             // if index was not set
             // select source randomly
             // otherwise get source index
             if (index === undefined) {
-                src = this._midRoll.src[this._rand(0, this._midRoll.src.length - 1)];
+                index = this._rand(0, this._midRoll.src.length - 1);
+                src = this._midRoll.src[index];
             } else {
                 src = this._midRoll.src[index];
             }
@@ -337,13 +349,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._midRoll) {
+                video.attachOnClick(function (evt) {
+                    this._midRoll.onClick(this._midRoll, { position: 'midroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._midRoll) {
-                this._midRoll.onPlay(this._midRoll, { position: 'preroll' });
+                this._midRoll.onPlay(this._midRoll, { position: 'midroll', index: index });
             }
 
             video.onEnd = (function () {
@@ -368,8 +387,10 @@
             // if src is an array
             // select randomly one of the videos
             var src;
-            if (typeof(this._postRoll.src) === "object") {
-                src = this._postRoll.src[this._rand(0, this._postRoll.src.length - 1)];
+            var index = 0;
+            if (typeof (this._postRoll.src) === "object") {
+                index = this._rand(0, this._postRoll.src.length - 1);
+                src = this._postRoll.src[index];
             } else {
                 src = this._postRoll.src;
             }
@@ -382,13 +403,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._postRoll) {
+                video.attachOnClick(function (evt) {
+                    this._postRoll.onClick(this._postRoll, { position: 'postroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._postRoll) {
-                this._postRoll.onPlay(this._postRoll, { position: 'preroll' });
+                this._postRoll.onPlay(this._postRoll, { position: 'postroll', index: index });
             }
 
             video.onEnd = (function () {
