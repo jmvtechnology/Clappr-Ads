@@ -1,6 +1,23 @@
 # Clappr-Ads
 Pre-roll, mid-roll and post-roll ads for the Clappr player
 
+## Link css and js
+
+Add javsscript and css files to your project.
+
+```
+    <script type="text/javascript" src="clappr.ads.js"></script>
+    <link rel="stylesheet" href="clappr.ads.css"></link>
+```
+
+You can change design of skip and mute buttons with CSS classes. See
+`clappr.ads.css` for class names. Default css colors are black for both
+mute and skip button.
+
+Keep `sound-on.svg` and `sound-off.svg` files in the same folder as the
+`clappr.ads.css` file.
+
+
 ### Set Up
 ```JS
 var player = new Clappr.Player({
