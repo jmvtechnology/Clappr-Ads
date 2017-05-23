@@ -21,40 +21,27 @@
 
     Video.prototype._initWrapper = function() {
         var el = document.createElement('div');
-        el.style.display = 'block';
-        el.style.position = 'absolute';
-        el.style.width = '100%';
-        el.style.height = '100%';
-        el.style.top = '0px';
-        el.style.left = '0px';
-        el.style.zIndex = 10000;
+        el.className = 'clappr-ads-wrapper';
         return el;
     };
 
     Video.prototype._initVideo = function(src) {
         var el = document.createElement('video');
-        el.style.display = 'block';
-        el.style.position = 'absolute';
-        el.style.width = '100%';
-        el.style.height = '100%';
         el.controls = false;
         el.src = src;
         el.addEventListener('ended', this._end.bind(this));
+        el.addEventListener('click', function (evt) {
+            if (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
+        }.bind(this));
         return el;
     };
 
     Video.prototype._initSkipButton = function (timeout) {
         var el = document.createElement('button');
-        el.style.display = 'none';
-        el.style.position = 'absolute';
-        el.style.bottom = '45px';
-        el.style.right = '0px';
-        el.style.padding = '15px';
-        el.style.backgroundColor = '#000';
-        el.style.border = 'solid thin #000';
-        el.style.fontSize = '12px';
-        el.style.color = '#FFF';
-        el.style.right = '-1px';
+        el.className = 'clappr-ads-skip-button';
         el.disabled = true;
         el.addEventListener('click', this._end.bind(this));
         this._skipButtonCountdown(el, timeout);
@@ -63,17 +50,25 @@
 
     Video.prototype._initMuteButton = function() {
         var el = document.createElement('div');
-        el.style.position = 'absolute';
-        el.style.bottom = '145px';
-        el.style.right = '100px';
-        el.style.padding = '15px';
-        el.style.backgroundColor = '#000';
-        el.style.border = 'solid thin #000';
-        el.style.fontSize = '12px';
-        el.style.color = '#FFF';
-        el.innerText = 'Volume';
-        el.addEventListener('click', function () {
+        el.className = 'clappr-ads-mute-button clappr-ads-mute-button-off';
+        el.addEventListener('click', function (evt) {
+            if (evt) {
+                evt.preventDefault();
+                evt.stopPropagation();
+            }
+
             this.video.muted = !this.video.muted;
+
+            // switch button-on / button-off css class
+            var className = evt.target.className
+                .replace('clappr-ads-mute-button-on', '')
+                .replace('clappr-ads-mute-button-off', '');
+
+            className = this.video.muted ?
+                (className += ' clappr-ads-mute-button-on') :
+                (className += ' clappr-ads-mute-button-off');
+
+            evt.target.className = className;
         }.bind(this));
         return el;
     };
@@ -94,8 +89,10 @@
 
     Video.prototype._end = function(evt) {
         // if click, prevent default
-        if (evt)
+        if (evt) {
             evt.preventDefault();
+            evt.stopPropagation();
+        }
 
         // remove video from the DOM
         this.wrapper.parentNode.removeChild(this.wrapper);
