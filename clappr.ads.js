@@ -9,6 +9,7 @@
         this.wrapper = this._initWrapper();
         this.video = this._initVideo(src);
         this.wrapper.appendChild(this.video);
+        this.muteButton = this._initMuteButton();
 
         // if skip is true
         // add skip button
@@ -60,6 +61,23 @@
         return el;
     };
 
+    Video.prototype._initMuteButton = function() {
+        var el = document.createElement('div');
+        el.style.position = 'absolute';
+        el.style.bottom = '145px';
+        el.style.right = '100px';
+        el.style.padding = '15px';
+        el.style.backgroundColor = '#000';
+        el.style.border = 'solid thin #000';
+        el.style.fontSize = '12px';
+        el.style.color = '#FFF';
+        el.innerText = 'Volume';
+        el.addEventListener('click', function () {
+            this.video.muted = !this.video.muted;
+        }.bind(this));
+        return el;
+    };
+
     Video.prototype._skipButtonCountdown = function(el, timeout) {
         var countDown = setInterval((function() {
             el.style.display = 'block';
@@ -94,6 +112,10 @@
 
     Video.prototype.pause = function() {
         this.video.pause();
+    };
+
+    Video.prototype.attachMuteButton = function () {
+        this.wrapper.appendChild(this.muteButton);
     };
 
     var ClapprAds = Clappr.UICorePlugin.extend({
@@ -264,6 +286,11 @@
                 video.text.skip = this._videoText.skip;
             }
 
+            // add mute button
+            if (this._preRoll.muteButton) {
+                video.attachMuteButton();
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
@@ -305,6 +332,11 @@
             // initialize video
             video = new Video(src, this._midRoll.skip, this._midRoll.timeout);
 
+            // add mute button
+            if (this._midRoll.muteButton) {
+                video.attachMuteButton();
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
@@ -344,6 +376,11 @@
 
             // initialize video
             video = new Video(src);
+
+            // add mute button
+            if (this._postRoll.muteButton) {
+                video.attachMuteButton();
+            }
 
             // render video
             container.$el.append(video.wrapper);
