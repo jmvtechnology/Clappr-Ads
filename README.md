@@ -10,7 +10,11 @@ var player = new Clappr.Player({
         preRoll: {
             src: ['video1.mp4', 'video2.mp4', 'video3.mp4'],
             skip: true,
-            timeout: 5
+            timeout: 5,
+            onPlay: function(ad, parameters) {
+                console.log('Started palying ad:', ad, ' with params:', params);
+            },
+            muteButton: true
         },
         midRoll: {
             at: [10, 20, 35],
@@ -93,13 +97,19 @@ midRoll: {
 |ads.preRoll.src|string/array|false|-|If array, it randomly selects a value|
 |ads.preRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.preRoll.timeout|integer|true|5|Countdown time|
+|ads.preRoll.onPlay|callback|true|null|callback function to call when ad starts playing|
+|ads.preRoll.muteButton|boolean|true|false|Adds optional mute/unmute button to video ad|
 |ads.midRoll|object|true|-|-|
 |ads.midRoll.at|integer/array|true|-|if unset, ad will play when video reaches 50%. If array, ad will play in the time (seconds) specified. If integer, ad will play once in the the time (seconds) specified|
 |ads.midRoll.src|string/array|false|-|If array, it randomly selects a value, unless it matches property 'at' in size, then it will play in order|
 |ads.midRoll.skip|boolean|true|true|Shows skip button with countdown|
 |ads.midRoll.timeout|integer|true|5|Countdown time|
+|ads.midRoll.onPlay|callback|true|null|callback function to call when ad starts playing|
+|ads.midRoll.muteButton|boolean|true|false|Adds optional mute/unmute button to video ad|
 |ads.postRoll|object|true|-|-|
 |ads.postRoll.src|string/array|false|-|If array, it randomly selects a value|
+|ads.postRoll.onPlay|callback|true|null|callback function to call when ad starts playing|
+|ads.postRoll.muteButton|boolean|true|false|Adds optional mute/unmute button to video ad|
 |ads.text|object|true|-|-|
 |ads.text.wait|string|true|Wait % seconds|Skip button wait text|
 |ads.text.skip|string|true|Skip >|Skip button action text|
