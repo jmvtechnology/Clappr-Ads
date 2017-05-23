@@ -53,6 +53,7 @@
         el.style.border = 'solid thin #000';
         el.style.fontSize = '12px';
         el.style.color = '#FFF';
+        el.style.right = '-1px';
         el.disabled = true;
         el.addEventListener('click', this._end.bind(this));
         this._skipButtonCountdown(el, timeout);
