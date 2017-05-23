@@ -6,7 +6,7 @@
             skip: 'Skip >'
         };
         this.onEnd = false;
-        this.wrapper = this._initWrapper();  
+        this.wrapper = this._initWrapper();
         this.video = this._initVideo(src);
         this.wrapper.appendChild(this.video);
 
@@ -77,7 +77,7 @@
         // if click, prevent default
         if (evt)
             evt.preventDefault();
-        
+
         // remove video from the DOM
         this.wrapper.parentNode.removeChild(this.wrapper);
 
@@ -220,7 +220,7 @@
             }
 
             // post-roll will not run if played before
-            if (this._postRoll && !this._hasPostRollPlayed) {
+            if (this._postRoll && !this._hasPostRollPlayed && current) {
                 // if the video is in it's end, play post-roll
                 if (current == duration) {
                     this.playPostRoll(container);
@@ -246,7 +246,7 @@
             } else {
                 src = this._preRoll.src;
             }
-            
+
             // pause playback
             container.playback.pause();
 
@@ -298,21 +298,21 @@
 
             // initialize video
             video = new Video(src, this._midRoll.skip, this._midRoll.timeout);
-            
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
             video.onEnd = (function() {
                 this._isAdPlaying = false;
             }).bind(this);
-            
+
         },
 
         playPostRoll: function(container) {
             // bail if ad is playing
             if (this._isAdPlaying)
                 return;
-            
+
             this._isAdPlaying = true;
 
             // prevent multiple calls whilst running
@@ -320,7 +320,7 @@
 
             // pause playback
             container.playback.pause();
-            
+
             // if src is an array
             // select randomly one of the videos
             var src;
@@ -332,7 +332,7 @@
 
             // initialize video
             video = new Video(src);
-            
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
