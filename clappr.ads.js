@@ -115,6 +115,10 @@
         this.wrapper.appendChild(this.muteButton);
     };
 
+    Video.prototype.attachOnClick = function (onClick) {
+        this.video.addEventListener('click', onClick);
+    };
+
     var ClapprAds = Clappr.UICorePlugin.extend({
         _isAdPlaying: false,
         _hasPreRollPlayed: false,
@@ -261,11 +265,10 @@
             // if src is an array
             // select randomly one of the videos
             var src;
-            if (typeof(this._preRoll.src) === "object") {
-                src = this._preRoll.src[this._rand(0, this._preRoll.src.length - 1)];
-            } else {
-                src = this._preRoll.src;
+            if (typeof (this._preRoll.src) === "object") {
+                index = this._rand(0, this._preRoll.src.length - 1);
             }
+            src = this._preRoll.src;
 
             // pause playback
             container.playback.pause();
@@ -288,13 +291,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._preRoll) {
+                video.attachOnClick(function (evt) {
+                    this._preRoll.onClick(this._preRoll, { position: 'preroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._preRoll) {
-                this._preRoll.onPlay(this._preRoll, { position: 'preroll' });
+                this._preRoll.onPlay(this._preRoll, { position: 'preroll', index: index });
             }
 
             // make sure pre-roll wont play again
@@ -321,10 +331,9 @@
             // select source randomly
             // otherwise get source index
             if (index === undefined) {
-                src = this._midRoll.src[this._rand(0, this._midRoll.src.length - 1)];
-            } else {
-                src = this._midRoll.src[index];
+                index = this._rand(0, this._midRoll.src.length - 1);
             }
+            src = this._midRoll.src[index];
 
             // initialize video
             video = new Video(src, this._midRoll.skip, this._midRoll.timeout);
@@ -334,13 +343,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._midRoll) {
+                video.attachOnClick(function (evt) {
+                    this._midRoll.onClick(this._midRoll, { position: 'midroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._midRoll) {
-                this._midRoll.onPlay(this._midRoll, { position: 'preroll' });
+                this._midRoll.onPlay(this._midRoll, { position: 'midroll', index: index });
             }
 
             video.onEnd = (function () {
@@ -365,11 +381,10 @@
             // if src is an array
             // select randomly one of the videos
             var src;
-            if (typeof(this._postRoll.src) === "object") {
-                src = this._postRoll.src[this._rand(0, this._postRoll.src.length - 1)];
-            } else {
-                src = this._postRoll.src;
+            if (typeof (this._postRoll.src) === "object") {
+                index = this._rand(0, this._postRoll.src.length - 1);
             }
+            src = this._postRoll.src;
 
             // initialize video
             video = new Video(src);
@@ -379,13 +394,20 @@
                 video.attachMuteButton();
             }
 
+            // call user's onclick if it is set
+            if ('onClick' in this._postRoll) {
+                video.attachOnClick(function (evt) {
+                    this._postRoll.onClick(this._postRoll, { position: 'postroll', index: index }, evt);
+                }.bind(this));
+            }
+
             // render video
             container.$el.append(video.wrapper);
             video.play();
 
             // call user's callback if it is set
             if ('onPlay' in this._postRoll) {
-                this._postRoll.onPlay(this._postRoll, { position: 'preroll' });
+                this._postRoll.onPlay(this._postRoll, { position: 'postroll', index: index });
             }
 
             video.onEnd = (function () {
