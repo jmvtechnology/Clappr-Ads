@@ -265,10 +265,13 @@
             // if src is an array
             // select randomly one of the videos
             var src;
+            var index = 0;
             if (typeof (this._preRoll.src) === "object") {
                 index = this._rand(0, this._preRoll.src.length - 1);
+                src = this._preRoll.src[index];
+            } else {
+                src = this._preRoll.src;
             }
-            src = this._preRoll.src;
 
             // pause playback
             container.playback.pause();
@@ -326,14 +329,17 @@
             container.playback.seek(parseInt(Math.floor(container.currentTime + 1)));
 
             var src;
+            var index = 0;
 
             // if index was not set
             // select source randomly
             // otherwise get source index
             if (index === undefined) {
                 index = this._rand(0, this._midRoll.src.length - 1);
+                src = this._midRoll.src[index];
+            } else {
+                src = this._midRoll.src[index];
             }
-            src = this._midRoll.src[index];
 
             // initialize video
             video = new Video(src, this._midRoll.skip, this._midRoll.timeout);
@@ -381,10 +387,13 @@
             // if src is an array
             // select randomly one of the videos
             var src;
+            var index = 0;
             if (typeof (this._postRoll.src) === "object") {
                 index = this._rand(0, this._postRoll.src.length - 1);
+                src = this._postRoll.src[index];
+            } else {
+                src = this._postRoll.src;
             }
-            src = this._postRoll.src;
 
             // initialize video
             video = new Video(src);
