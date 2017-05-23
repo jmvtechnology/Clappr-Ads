@@ -42,7 +42,7 @@
         return el;
     };
 
-    Video.prototype._initSkipButton = function(timeout) {
+    Video.prototype._initSkipButton = function (timeout) {
         var el = document.createElement('button');
         el.style.display = 'none';
         el.style.position = 'absolute';
@@ -268,6 +268,11 @@
             container.$el.append(video.wrapper);
             video.play();
 
+            // call user's callback if it is set
+            if ('onPlay' in this._preRoll) {
+                this._preRoll.onPlay(this._preRoll, { position: 'preroll' });
+            }
+
             // make sure pre-roll wont play again
             this._hasPreRollPlayed = true;
         },
@@ -303,7 +308,13 @@
             // render video
             container.$el.append(video.wrapper);
             video.play();
-            video.onEnd = (function() {
+
+            // call user's callback if it is set
+            if ('onPlay' in this._midRoll) {
+                this._midRoll.onPlay(this._midRoll, { position: 'preroll' });
+            }
+
+            video.onEnd = (function () {
                 this._isAdPlaying = false;
             }).bind(this);
 
@@ -325,10 +336,10 @@
             // if src is an array
             // select randomly one of the videos
             var src;
-            if (typeof(this._preRoll.src) === "object") {
-                src = this._preRoll.src[this._rand(0, this._preRoll.src.length - 1)];
+            if (typeof(this._postRoll.src) === "object") {
+                src = this._postRoll.src[this._rand(0, this._postRoll.src.length - 1)];
             } else {
-                src = this._preRoll.src;
+                src = this._postRoll.src;
             }
 
             // initialize video
@@ -337,7 +348,13 @@
             // render video
             container.$el.append(video.wrapper);
             video.play();
-            video.onEnd = (function() {
+
+            // call user's callback if it is set
+            if ('onPlay' in this._postRoll) {
+                this._postRoll.onPlay(this._postRoll, { position: 'preroll' });
+            }
+
+            video.onEnd = (function () {
                 this._isAdPlaying = false;
             }).bind(this);
         },
